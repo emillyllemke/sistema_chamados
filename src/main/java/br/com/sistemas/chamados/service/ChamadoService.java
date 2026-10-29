@@ -7,14 +7,16 @@ import br.com.sistemas.chamados.entity.StatusChamado;
 import br.com.sistemas.chamados.entity.Tecnico;
 import br.com.sistemas.chamados.exception.ChamadoFechadoException;
 import br.com.sistemas.chamados.exception.RecursoNaoEncontradoException;
-import br.com.sistemas.chamados.repository.ChamadoRepository;
-import br.com.sistemas.chamados.repository.ClienteRepository;
-import br.com.sistemas.chamados.repository.CategoriaRepository;
-import br.com.sistemas.chamados.repository.TecnicoRepository;
+import br.com.sistemas.chamados.repository.*;
+import br.com.sistemas.chamados.entity.Comentario;
+import br.com.sistemas.chamados.dto.ComentarioRequest;
+import br.com.sistemas.chamados.dto.ComentarioResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import br.com.sistemas.chamados.entity.Prioridade;
+import br.com.sistemas.chamados.entity.HistoricoStatus;
+import br.com.sistemas.chamados.repository.HistoricoStatusRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,18 +24,26 @@ import java.util.stream.Collectors;
 
 @Service
 public class ChamadoService {
-
+    private final ComentarioRepository comentarioRepository;
     private final ChamadoRepository chamadoRepository;
     private final ClienteRepository clienteRepository;
     private final CategoriaRepository categoriaRepository;
     private final TecnicoRepository tecnicoRepository;
+    private final HistoricoStatusRepository historicoRepository;
 
-    public ChamadoService(ChamadoRepository chamadoRepository, ClienteRepository clienteRepository,
-                          CategoriaRepository categoriaRepository, TecnicoRepository tecnicoRepository) {
+    public ChamadoService(ChamadoRepository chamadoRepository,
+                          ClienteRepository clienteRepository,
+                          CategoriaRepository categoriaRepository,
+                          TecnicoRepository tecnicoRepository,
+                          ComentarioRepository comentarioRepository,
+                          HistoricoStatusRepository historicoRepository) {
+
         this.chamadoRepository = chamadoRepository;
         this.clienteRepository = clienteRepository;
         this.categoriaRepository = categoriaRepository;
         this.tecnicoRepository = tecnicoRepository;
+        this.comentarioRepository = comentarioRepository;
+        this.historicoRepository = historicoRepository;
     }
 
     public ChamadoResponse salvar(ChamadoRequest request) {
@@ -84,6 +94,13 @@ public class ChamadoService {
             throw new ChamadoFechadoException("Impedido: Não é possível alterar um chamado fechado.");
         }
 
+        if (chamado.getStatus() != novoStatus) {
+            HistoricoStatus historico = new HistoricoStatus();
+            historico.setStatusAnterior(chamado.getStatus());
+            historico.setStatusNovo(novoStatus);
+            historico.setChamado(chamado);
+            historicoRepository.save(historico);
+        }
         chamado.setStatus(novoStatus);
 
         if (novoStatus == StatusChamado.FECHADO) {
@@ -107,5 +124,18 @@ public class ChamadoService {
         return chamadoRepository.findAll().stream()
                 .map(ChamadoResponse::new)
                 .collect(Collectors.toList());
+    }
+
+    public ComentarioResponse adicionarComentario(Long chamadoId, ComentarioRequest request) {
+        Chamado chamado = chamadoRepository.findById(chamadoId)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Chamado não encontrado"));
+
+        Comentario comentario = new Comentario();
+        comentario.setTexto(request.getTexto());
+        comentario.setAutor(request.getAutor());
+        comentario.setChamado(chamado);
+
+        Comentario salvo = comentarioRepository.save(comentario);
+        return new ComentarioResponse(salvo);
     }
 }

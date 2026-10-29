@@ -4,6 +4,8 @@ import br.com.sistemas.chamados.entity.Prioridade;
 import br.com.sistemas.chamados.entity.StatusChamado;
 import br.com.sistemas.chamados.entity.Chamado;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ChamadoResponse {
 
@@ -17,6 +19,7 @@ public class ChamadoResponse {
     private Long clienteId;
     private Long categoriaId;
     private Long tecnicoId;
+    private List<ComentarioResponse> comentarios;
 
     public ChamadoResponse() {}
 
@@ -32,6 +35,11 @@ public class ChamadoResponse {
         if (chamado.getCliente() != null) this.clienteId = chamado.getCliente().getId();
         if (chamado.getCategoria() != null) this.categoriaId = chamado.getCategoria().getId();
         if (chamado.getTecnico() != null) this.tecnicoId = chamado.getTecnico().getId();
+        if (chamado.getComentarios() != null) {
+            this.comentarios = chamado.getComentarios().stream()
+                    .map(ComentarioResponse::new)
+                    .collect(Collectors.toList());
+        }
     }
 
     // Getters e Setters
@@ -55,4 +63,5 @@ public class ChamadoResponse {
     public void setCategoriaId(Long categoriaId) { this.categoriaId = categoriaId; }
     public Long getTecnicoId() { return tecnicoId; }
     public void setTecnicoId(Long tecnicoId) { this.tecnicoId = tecnicoId; }
+    public List<ComentarioResponse> getComentarios() { return comentarios; }
 }

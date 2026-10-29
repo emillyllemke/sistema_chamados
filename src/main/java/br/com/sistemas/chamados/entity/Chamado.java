@@ -2,6 +2,8 @@ package br.com.sistemas.chamados.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Chamado {
@@ -39,6 +41,18 @@ public class Chamado {
         this.status = StatusChamado.ABERTO;
         this.dataAbertura = LocalDateTime.now();
     }
+
+    @OneToMany(mappedBy = "chamado", cascade = CascadeType.ALL)
+    private List<Comentario> comentarios = new ArrayList<>();
+
+    public List<Comentario> getComentarios() { return comentarios; }
+    public void setComentarios(List<Comentario> comentarios) { this.comentarios = comentarios; }
+
+    @OneToMany(mappedBy = "chamado", cascade = CascadeType.ALL)
+    private List<HistoricoStatus> historico = new ArrayList<>();
+
+    public List<HistoricoStatus> getHistorico() { return historico; }
+    public void setHistorico(List<HistoricoStatus> historico) { this.historico = historico; }
 
     public Long getId() {
         return id;

@@ -2,6 +2,8 @@ package br.com.sistemas.chamados.controller;
 
 import br.com.sistemas.chamados.dto.ChamadoRequest;
 import br.com.sistemas.chamados.dto.ChamadoResponse;
+import br.com.sistemas.chamados.dto.ComentarioRequest;
+import br.com.sistemas.chamados.dto.ComentarioResponse;
 import br.com.sistemas.chamados.entity.Chamado;
 import br.com.sistemas.chamados.entity.StatusChamado;
 import br.com.sistemas.chamados.service.ChamadoService;
@@ -32,6 +34,14 @@ public class ChamadoController {
     public ResponseEntity<ChamadoResponse> criar(@RequestBody ChamadoRequest chamadoRequest) {
         ChamadoResponse response = service.salvar(chamadoRequest);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+    @PostMapping("/{id}/comentarios")
+    public ResponseEntity<ComentarioResponse> adicionarComentario(
+            @PathVariable Long id,
+            @RequestBody ComentarioRequest request) {
+
+        ComentarioResponse response = service.adicionarComentario(id, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
