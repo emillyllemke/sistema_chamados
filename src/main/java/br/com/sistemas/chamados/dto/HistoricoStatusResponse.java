@@ -12,4 +12,27 @@ public class HistoricoStatusResponse {
         this.statusNovo = h.getStatusNovo().name();
         this.dataMudanca = h.getDataMudanca();
     }
+    public String getStatusAnterior() {
+        return statusAnterior;
+    }
+
+    public void setStatusAnterior(String statusAnterior) {
+        this.statusAnterior = statusAnterior;
+    }
+
+    public String getStatusNovo() {
+        return statusNovo;
+    }
+
+    public void setStatusNovo(String statusNovo) {
+        this.statusNovo = statusNovo;
+    }
+
+    public LocalDateTime getDataMudanca() {
+        return dataMudanca;
+    }
+
+    public void setDataMudanca(LocalDateTime dataMudanca) {
+        this.dataMudanca = dataMudanca;
+    }
 }
