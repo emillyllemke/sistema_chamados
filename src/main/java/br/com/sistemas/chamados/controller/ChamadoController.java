@@ -9,6 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import br.com.sistemas.chamados.entity.Prioridade;
 
 import java.util.List;
 import java.util.Map; // <-- Importação adicionada para resolver o erro do Map
@@ -31,8 +35,14 @@ public class ChamadoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ChamadoResponse>> listarTodos() {
-        return ResponseEntity.ok(service.listarTodos());
+    public ResponseEntity<Page<ChamadoResponse>> listarComFiltros(
+            @RequestParam(required = false) StatusChamado status,
+            @RequestParam(required = false) Prioridade prioridade,
+            @RequestParam(required = false) Long clienteId,
+            @PageableDefault(size = 10, sort = "dataAbertura") Pageable pageable) {
+
+        Page<ChamadoResponse> pagina = service.listarComFiltros(status, prioridade, clienteId, pageable);
+        return ResponseEntity.ok(pagina);
     }
 
     @PatchMapping("/{id}/atribuir")

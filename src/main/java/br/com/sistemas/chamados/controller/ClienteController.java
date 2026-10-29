@@ -12,19 +12,26 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 
+import br.com.sistemas.chamados.service.ChamadoService;
 import br.com.sistemas.chamados.dto.ClienteRequest;
 import br.com.sistemas.chamados.dto.ClienteResponse;
 import br.com.sistemas.chamados.service.ClienteService;
+import br.com.sistemas.chamados.dto.ChamadoResponse;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/clientes")
 public class ClienteController {
     private final ClienteService service;
+    private final ChamadoService chamadoService;
 
-    public ClienteController(ClienteService service) {
+    public ClienteController(ClienteService service, ChamadoService chamadoService) {
         this.service = service;
+        this.chamadoService = chamadoService;
     }
 
     @PostMapping
@@ -37,6 +44,15 @@ public class ClienteController {
     @GetMapping 
     public List<ClienteResponse> listar() {
         return service.listar();
+    }
+
+    @GetMapping("/{id}/chamados")
+    public ResponseEntity<Page<ChamadoResponse>> listarChamadosDoCliente(
+            @PathVariable Long id,
+            @PageableDefault(size = 10, sort = "dataAbertura") Pageable pageable) {
+
+        Page<ChamadoResponse> pagina = chamadoService.listarPorCliente(id, pageable);
+        return ResponseEntity.ok(pagina);
     }
 
     @GetMapping("/{id}")

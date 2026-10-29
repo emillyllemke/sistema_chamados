@@ -12,6 +12,9 @@ import br.com.sistemas.chamados.repository.ClienteRepository;
 import br.com.sistemas.chamados.repository.CategoriaRepository;
 import br.com.sistemas.chamados.repository.TecnicoRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import br.com.sistemas.chamados.entity.Prioridade;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -88,6 +91,16 @@ public class ChamadoService {
         }
 
         return chamadoRepository.save(chamado);
+    }
+
+    public Page<ChamadoResponse> listarComFiltros(StatusChamado status, Prioridade prioridade, Long clienteId, Pageable pageable) {
+        return chamadoRepository.findByFiltros(status, prioridade, clienteId, pageable)
+                .map(ChamadoResponse::new);
+    }
+
+    public Page<ChamadoResponse> listarPorCliente(Long clienteId, Pageable pageable) {
+        return chamadoRepository.findByClienteId(clienteId, pageable)
+                .map(ChamadoResponse::new);
     }
 
     public List<ChamadoResponse> listarTodos() {
