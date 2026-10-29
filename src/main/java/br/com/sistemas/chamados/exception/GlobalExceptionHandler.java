@@ -35,4 +35,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status)
                 .body(new ErroResposta(LocalDateTime.now(), status.value(), erro, detalhes));
     }
+
+    @ExceptionHandler(ChamadoFechadoException.class)
+    public ResponseEntity<String> handleChamadoFechado(ChamadoFechadoException ex) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(ex.getMessage());
+    }
 }

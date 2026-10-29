@@ -31,7 +31,7 @@ public class TecnicoController {
     public ResponseEntity<TecnicoResponse> criar(
         @Valid @RequestBody TecnicoRequest dto) {
         TecnicoResponse criado = service.criar(dto);
-        return ResponseEntity.created(URI.create("/tecnicos/" + criado.id())).body(criado);
+        return ResponseEntity.created(URI.create("/tecnicos" + criado.id())).body(criado);
     }
 
     @GetMapping 
